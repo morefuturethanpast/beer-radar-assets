@@ -1,70 +1,145 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Beer Radar Premium</title><meta name="robots" content="noindex"><meta name="referrer" content="no-referrer">
 <!-- Shown by Paddle after a successful Premium payment (successUrl). Public page, no personal data.
-     Source: beer-radar/worker/static-pay/gracias/index.html -->
+     Source: beer-radar/worker/static-pay/gracias/index.html. Design: docs/design/premium-welcome-brainstorm.md
+     (approved by the owner 2026-11-27): payment confirmed, example alert card, "pays for itself" estimate,
+     first-alert button, language menu. -->
 <style>
-:root{--accent:#2445c4;--accent-soft:#e3e9fb;--tag:#ffd23f;--tag-fg:#1b1600;--ink:#1d2433;--muted:#5b6475;--bg:#f4f6fb;--card:#fff;--down:#0b7a3e}
-@media (prefers-color-scheme:dark){:root{--ink:#e8ecf6;--muted:#a3abbd;--bg:#0f1420;--card:#182033;--accent-soft:#22305a}}
+:root{--accent:#2445c4;--accent-soft:#e3e9fb;--tag:#ffd23f;--tag-fg:#1b1600;--ink:#1d2433;--muted:#5b6475;--bg:#f4f6fb;--card:#fff;--down:#0b7a3e;--down-soft:#e2f4ea;--line:#dfe4ee}
+@media (prefers-color-scheme:dark){:root{--ink:#e8ecf6;--muted:#a3abbd;--bg:#0f1420;--card:#182033;--accent-soft:#22305a;--down:#4fd18b;--down-soft:#143726;--line:#2a3550}}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
-main{width:100%;max-width:440px;background:var(--card);border-radius:20px;padding:28px 24px;box-shadow:0 10px 30px rgba(20,30,60,.12);text-align:center}
+main{position:relative;width:100%;max-width:440px;background:var(--card);border-radius:20px;padding:52px 24px 22px;box-shadow:0 10px 30px rgba(20,30,60,.12);text-align:center}
+.lang{position:absolute;top:12px;right:12px;z-index:6}
+.lang select{appearance:none;-webkit-appearance:none;font:inherit;font-size:13px;font-weight:600;color:var(--ink);background:var(--accent-soft);border:0;border-radius:999px;padding:6px 26px 6px 12px;min-height:32px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 13px) 50%,calc(100% - 9px) 50%;background-size:4px 4px;background-repeat:no-repeat}
+.lang select:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
 .logo{width:72px;height:72px;border-radius:18px}
-.pro{display:inline-block;background:var(--tag);color:var(--tag-fg);font-weight:700;font-size:12px;letter-spacing:.06em;padding:3px 10px;border-radius:999px;margin-top:12px}
-h1{font-size:24px;margin:10px 0 4px}p{margin:0 0 6px;color:var(--muted)}
-ul{list-style:none;padding:0;margin:20px 0;text-align:left;display:grid;gap:12px}
-li{display:flex;gap:12px;align-items:flex-start;background:var(--accent-soft);border-radius:12px;padding:12px}
-li span{font-size:22px;line-height:1}li b{display:block;color:var(--ink)}li small{color:var(--muted)}
-.note{font-size:14px;margin:4px 0 18px}
+.paid{display:inline-flex;gap:6px;align-items:center;margin-top:12px;font-size:14px;font-weight:700;color:var(--down)}
+.pro{display:inline-block;background:var(--tag);color:var(--tag-fg);font-weight:700;font-size:12px;letter-spacing:.06em;padding:3px 10px;border-radius:999px;margin-left:6px;vertical-align:1px}
+h1{font-size:25px;line-height:1.2;margin:10px 0 18px}p{margin:0 0 6px;color:var(--muted)}
+/* example alert card: what Premium delivers */
+.alert{position:relative;text-align:left;border:1px solid var(--line);border-left:5px solid var(--down);border-radius:14px;padding:12px 14px;margin:0 0 14px;background:var(--card);box-shadow:0 4px 14px rgba(20,30,60,.08)}
+.alert .top{display:flex;align-items:center;gap:8px;font-weight:800}
+.alert .ex{margin-left:auto;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+.alert .beer{display:block;font-size:14px;color:var(--muted);margin:2px 0 8px}
+.alert .row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.alert .store{color:var(--muted);font-size:14px;margin-right:auto}
+.alert s{color:var(--muted)}
+.alert .new{font-weight:800;font-size:20px;color:var(--ink)}
+.alert .drop{font-weight:800;color:var(--down);background:var(--down-soft);border-radius:8px;padding:2px 8px}
+.alert .goal{display:block;margin-top:8px;font-size:13px}
+.alert .goal b{background:var(--tag);color:var(--tag-fg);border-radius:6px;padding:0 6px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:0 0 16px;padding:0;list-style:none}
+.chips li{font-size:13px;font-weight:600;background:var(--accent-soft);border-radius:999px;padding:4px 10px}
+/* "pays for itself" box with the saving estimate */
+.save{background:var(--card);border:2px dashed var(--tag);border-radius:14px;padding:12px;margin:0 0 16px;text-align:left}
+.save .head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.save .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--tag);color:var(--tag-fg);border-radius:999px;padding:2px 8px}
+.save .vs{display:flex;align-items:center;gap:10px;margin:8px 0 4px}
+.save .cost,.save .gain{flex:1;border-radius:10px;padding:8px;text-align:center}
+.save .cost{background:var(--bg)}.save .gain{background:var(--down-soft)}
+.save .cost b,.save .gain b{display:block;font-size:20px;font-weight:800}.save .gain b{color:var(--down)}
+.save .cost small,.save .gain small{display:block;font-size:12px;color:var(--muted)}
+.save details{font-size:13px;color:var(--muted)}.save summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:24px}
+.status{font-size:14px;margin:0 0 14px}
+.status b{color:var(--ink)}
 a.btn{display:block;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:12px}
-a.btn:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
+a.btn:focus-visible,a.link:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
+.hint{font-size:13px;margin:6px 0 0}
+a.link{display:inline-block;margin-top:10px;color:var(--accent);font-weight:600;text-decoration:none;min-height:24px}
+.fine{font-size:12px;margin-top:14px}
 
-/* delight: radar rings, badge pop, staggered benefits, confetti (all off with reduced motion) */
+/* delight: radar rings, badge pop, staggered blocks, confetti (all off with reduced motion) */
 .hero{position:relative;width:120px;height:120px;margin:0 auto;display:grid;place-items:center}
 .radar{position:absolute;inset:0;width:100%;height:100%;color:var(--accent)}
-.radar .sweep{transform-origin:14px 14px;animation:sweep 6s linear infinite}
-.save{background:var(--card);border:2px dashed var(--tag);border-radius:14px;padding:12px;margin:0 0 16px;text-align:left;animation:rise .5s ease-out 1.1s both}
-.save .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--tag);color:var(--tag-fg);border-radius:999px;padding:2px 8px}
-.save .big{display:block;font-size:22px;font-weight:800;color:var(--down);margin:6px 0 2px}
-.save small{color:var(--muted);font-size:13px}
-.hero .logo{position:relative;z-index:1;animation:pop .7s cubic-bezier(.2,1.6,.4,1) both}
-.ring{position:absolute;inset:24px;border:2px solid var(--accent);border-radius:50%;opacity:0;animation:ping 2.4s ease-out .5s infinite}
+/* The sweep is an HTML disc turned around its own centre (an SVG <g> with a px transform-origin
+   turned around the wrong point in some browsers and stuck out of the logo like a bent antenna). */
+.sweep{position:absolute;inset:4px;border-radius:50%;background:conic-gradient(from 0deg,color-mix(in srgb,var(--accent) 30%,transparent),transparent 80deg);transform-origin:50% 50%;animation:sweep 6s linear infinite}
+.hero .logo{position:relative;z-index:1;display:block;animation:grow .6s cubic-bezier(.2,.8,.3,1) both}
+.ring{position:absolute;inset:24px;border:2px solid var(--accent);border-radius:50%;opacity:0;transform-origin:50% 50%;animation:ping 2.4s ease-out .5s infinite}
 .ring.r2{animation-delay:1.3s}
-.pro{animation:pop .6s cubic-bezier(.2,1.6,.4,1) .35s both}
+.paid{animation:rise .5s ease-out .3s both}
 h1{animation:rise .5s ease-out .45s both}
-li{animation:rise .5s ease-out both}li:nth-child(1){animation-delay:.7s}li:nth-child(2){animation-delay:.85s}li:nth-child(3){animation-delay:1s}
-a.btn{animation:rise .5s ease-out 1.2s both;transition:transform .15s}a.btn:hover{transform:translateY(-2px)}
+.alert{animation:slide .55s cubic-bezier(.2,.8,.3,1) .7s both}
+.alert .drop{animation:ding .6s ease-out 1.3s both}
+.chips{animation:rise .5s ease-out .95s both}
+.save{animation:rise .5s ease-out 1.1s both}
+a.btn{animation:rise .5s ease-out 1.25s both;transition:transform .15s}a.btn:hover{transform:translateY(-2px)}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-@keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes rise{0%{transform:translateY(14px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes slide{0%{transform:translateX(-24px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes ding{0%{transform:scale(1)}40%{transform:scale(1.18)}100%{transform:scale(1)}}
 @keyframes sweep{to{transform:rotate(360deg)}}
-@keyframes ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.6);opacity:0}}
+@keyframes ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.6);opacity:0}}
+@keyframes grow{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#fx{display:none}}
 </style></head>
 <body><canvas id="fx" aria-hidden="true"></canvas><main>
-<div class="hero"><svg class="radar" viewBox="0 0 28 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width=".8"><circle cx="14" cy="14" r="13" opacity=".3"/><circle cx="14" cy="14" r="9.5" opacity=".45"/><g class="sweep"><path d="M14 14 L14 1" stroke-width="1.2" stroke-linecap="round"/><path d="M14 14 L14 1 A13 13 0 0 1 25.3 7.5 Z" fill="currentColor" stroke="none" opacity=".22"/></g><circle cx="21" cy="7.6" r="1.2" fill="#ffd23f" stroke="none"/></svg><span class="ring"></span><span class="ring r2"></span><img class="logo" src="../../icon/beer-radar-icon-512.png" alt="Beer Radar"></div>
-<div class="pro">PREMIUM</div>
-<h1 data-t="title">¡Bienvenido a Premium!</h1>
-<p data-t="thanks">Gracias por apoyar Beer Radar. Esto es lo que tienes ahora:</p>
-<ul>
-<li><span>🔔</span><div><b data-t="b1">Alertas de bajada de precio</b><small data-t="b1s">Te avisamos cuando tu cerveza baja en tu súper, con el precio anterior tachado.</small></div></li>
-<li><span>🎯</span><div><b data-t="b2">Tu precio objetivo</b><small data-t="b2s">Elige cuánto quieres pagar, en uno o en todos tus supermercados.</small></div></li>
-<li><span>⭐</span><div><b data-t="b3">Lo importante, arriba</b><small data-t="b3s">Las alertas cumplidas salen arriba del todo al abrir la app.</small></div></li>
-</ul>
-<div class="save" id="save"><span class="tag" data-t="estTag">Estimación</span><b class="big" data-t="estBig">≈ 7 € de ahorro al mes</b><small data-t="estHow">Si compras unos 12 botellines a la semana y las alertas te hacen comprar cuando bajan unos 0,15 € cada uno. Premium cuesta 1,99 € al mes. Es una estimación: tu ahorro real depende de lo que compres.</small></div>
-<p class="note" data-t="note">Tu Premium se activa en unas horas, cuando confirmamos el pago. Puedes cancelar cuando quieras desde el e-mail de Paddle.</p>
-<a class="btn" id="open" href="https://claude.ai/artifact/SDr6rYmGxJVRmnvZVfQ3Ge" data-t="open">Abrir Beer Radar</a>
+<div class="lang"><label><span class="sr" hidden data-t="langLabel">Idioma</span><select id="lang" aria-label="Idioma">
+<option value="es">ES · Español</option><option value="ca">CA · Català</option><option value="en">EN · English</option><option value="pt">PT · Português</option></select></label></div>
+<div class="hero"><svg class="radar" viewBox="0 0 120 120" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="60" cy="60" r="56" opacity=".3"/><circle cx="60" cy="60" r="44" opacity=".45"/></svg><span class="sweep" aria-hidden="true"></span><span class="ring"></span><span class="ring r2"></span><img class="logo" src="../../icon/beer-radar-icon-512.png" alt="Beer Radar"></div>
+<div class="paid" id="paid">✓ <span data-t="paid">Pago recibido</span><span class="pro">PREMIUM</span></div>
+<h1 data-t="title">Tu radar ya vigila tus cervezas</h1>
+
+<!-- Example alert. Prices are never invented: EXAMPLE below stays null until a real past drop exists in the app's
+     price history (store prices are public data). With null, the card shows only the 0,15 € drop used by the estimate. -->
+<div class="alert" id="alert" role="img" aria-labelledby="alertTitle alertBeer alertRow alertGoal">
+  <div class="top"><span aria-hidden="true">🔔</span><span id="alertTitle" data-t="aTitle">¡Ha bajado!</span><span class="ex" data-t="aEx">Ejemplo</span></div>
+  <span class="beer" id="alertBeer" data-t="aBeer">Damm Lemon · botellín 25 cl · vidrio</span>
+  <div class="row" id="alertRow"><span class="store" id="aStore" data-t="aStore">En tu supermercado</span><span id="aPrices"></span><span class="drop" id="aDrop">−0,15 €</span></div>
+  <span class="goal" id="alertGoal" data-t-html="aGoal">Te avisamos al llegar a tu <b>precio objetivo</b>.</span>
+</div>
+<ul class="chips"><li data-t="c1">🔔 Alertas de bajada</li><li data-t="c2">🎯 Precio objetivo</li><li data-t="c3">⭐ Lo importante, arriba</li><li data-t="c4">0,0 sin alcohol incluidas</li></ul>
+
+<div class="save" id="save">
+  <div class="head"><b data-t="payTitle">Premium se paga solo</b><span class="tag" data-t="estTag">Estimación</span></div>
+  <div class="vs"><div class="cost"><b>1,99 €</b><small data-t="costLbl">Premium al mes</small></div><span aria-hidden="true">vs</span><div class="gain"><b>≈ 7 €</b><small data-t="gainLbl">de ahorro al mes</small></div></div>
+  <details><summary data-t="howSum">¿Cómo lo calculamos?</summary><span data-t="estHow">Si compras unos 12 botellines a la semana y las alertas te hacen comprar cuando bajan unos 0,15 € cada uno. Premium cuesta 1,99 € al mes. Es una estimación: tu ahorro real depende de lo que compres.</span></details>
+</div>
+
+<p class="status" id="status" data-t-html="status"><b>Activando tu Premium:</b> suele tardar menos de 3 horas. Ya puedes crear tus alertas; empezarán a avisarte en cuanto se active.</p>
+<a class="btn" id="open" href="https://claude.ai/artifact/SDr6rYmGxJVRmnvZVfQ3Ge" data-t="open">Crear mi primera alerta</a>
+<p class="hint" data-t="hint">En la app, toca 🔔 Alertas arriba o el precio de tu cerveza.</p>
+<a class="link" id="table" href="https://claude.ai/artifact/SDr6rYmGxJVRmnvZVfQ3Ge" data-t="table">Ir a la tabla de precios</a>
+<p class="fine" data-t="fine">Puedes cancelar cuando quieras desde el e-mail de Paddle.</p>
 </main>
 <script>
+// Example alert from a real past drop: {store: "Supermarket name", old: 0.84, now: 0.69, date: "YYYY-MM-DD"}.
+// Leave null until the price history has one (owner rule: never invent prices).
+var EXAMPLE = null;
 (function () {
   var T = {
-    en: { title: "Welcome to Premium!", thanks: "Thanks for supporting Beer Radar. Here is what you get now:", b1: "Price drop alerts", b1s: "We tell you when your beer gets cheaper at your supermarket, with the old price struck through.", b2: "Your target price", b2s: "Choose how much you want to pay, at one or all of your supermarkets.", b3: "What matters, on top", b3s: "Alerts that are met show at the very top when you open the app.", note: "Your Premium turns on within a few hours, once we confirm the payment. You can cancel any time from Paddle's e-mail.", open: "Open Beer Radar", estTag: "Estimate", estBig: "≈ €7 saved per month", estHow: "If you buy about 12 bottles a week and alerts get you to buy when they drop about €0.15 each. Premium costs €1.99 a month. This is an estimate: your real saving depends on what you buy." },
-    pt: { title: "Bem-vindo ao Premium!", thanks: "Obrigado por apoiar o Beer Radar. Agora você tem:", b1: "Alertas de queda de preço", b1s: "Avisamos quando sua cerveja fica mais barata no seu supermercado, com o preço anterior riscado.", b2: "Seu preço-alvo", b2s: "Escolha quanto quer pagar, em um ou em todos os seus supermercados.", b3: "O importante, no topo", b3s: "Os alertas cumpridos aparecem no topo ao abrir o app.", note: "Seu Premium é ativado em algumas horas, quando confirmamos o pagamento. Você pode cancelar quando quiser pelo e-mail da Paddle.", open: "Abrir o Beer Radar", estTag: "Estimativa", estBig: "≈ 7 € de economia por mês", estHow: "Se você compra uns 12 long necks por semana e os alertas fazem você comprar quando baixam uns 0,15 € cada. O Premium custa 1,99 € por mês. É uma estimativa: sua economia real depende do que você compra." },
-    ca: { title: "Benvingut a Premium!", thanks: "Gràcies per donar suport a Beer Radar. Això és el que tens ara:", b1: "Alertes de baixada de preu", b1s: "T'avisem quan la teva cervesa baixa al teu súper, amb el preu anterior ratllat.", b2: "El teu preu objectiu", b2s: "Tria quant vols pagar, en un o en tots els teus supermercats.", b3: "El més important, a dalt", b3s: "Les alertes complertes surten a dalt de tot en obrir l'app.", note: "El teu Premium s'activa en unes hores, quan confirmem el pagament. Pots cancel·lar quan vulguis des del correu de Paddle.", open: "Obrir Beer Radar", estTag: "Estimació", estBig: "≈ 7 € d'estalvi al mes", estHow: "Si compres uns 12 botellins a la setmana i les alertes et fan comprar quan baixen uns 0,15 € cadascun. Premium costa 1,99 € al mes. És una estimació: el teu estalvi real depèn del que compris." }
+    es: { langLabel: "Idioma", paid: "Pago recibido", title: "Tu radar ya vigila tus cervezas", aTitle: "¡Ha bajado!", aEx: "Ejemplo", aBeer: "Damm Lemon · botellín 25 cl · vidrio", aStore: "En tu supermercado", aGoal: "Te avisamos al llegar a tu <b>precio objetivo</b>.", c1: "🔔 Alertas de bajada", c2: "🎯 Precio objetivo", c3: "⭐ Lo importante, arriba", c4: "0,0 sin alcohol incluidas", payTitle: "Premium se paga solo", estTag: "Estimación", costLbl: "Premium al mes", gainLbl: "de ahorro al mes", howSum: "¿Cómo lo calculamos?", estHow: "Si compras unos 12 botellines a la semana y las alertas te hacen comprar cuando bajan unos 0,15 € cada uno. Premium cuesta 1,99 € al mes. Es una estimación: tu ahorro real depende de lo que compres.", status: "<b>Activando tu Premium:</b> suele tardar menos de 3 horas. Ya puedes crear tus alertas; empezarán a avisarte en cuanto se active.", open: "Crear mi primera alerta", hint: "En la app, toca 🔔 Alertas arriba o el precio de tu cerveza.", table: "Ir a la tabla de precios", fine: "Puedes cancelar cuando quieras desde el e-mail de Paddle.", exDate: "Ejemplo real del {d}" },
+    ca: { langLabel: "Idioma", paid: "Pagament rebut", title: "El teu radar ja vigila les teves cerveses", aTitle: "Ha baixat!", aEx: "Exemple", aBeer: "Damm Lemon · botellí 25 cl · vidre", aStore: "Al teu supermercat", aGoal: "T'avisem quan arribi al teu <b>preu objectiu</b>.", c1: "🔔 Alertes de baixada", c2: "🎯 Preu objectiu", c3: "⭐ El més important, a dalt", c4: "0,0 sense alcohol incloses", payTitle: "Premium es paga sol", estTag: "Estimació", costLbl: "Premium al mes", gainLbl: "d'estalvi al mes", howSum: "Com ho calculem?", estHow: "Si compres uns 12 botellins a la setmana i les alertes et fan comprar quan baixen uns 0,15 € cadascun. Premium costa 1,99 € al mes. És una estimació: el teu estalvi real depèn del que compris.", status: "<b>Activant el teu Premium:</b> sol trigar menys de 3 hores. Ja pots crear les teves alertes; començaran a avisar-te quan s'activi.", open: "Crear la meva primera alerta", hint: "A l'app, toca 🔔 Alertes a dalt o el preu de la teva cervesa.", table: "Anar a la taula de preus", fine: "Pots cancel·lar quan vulguis des del correu de Paddle.", exDate: "Exemple real del {d}" },
+    en: { langLabel: "Language", paid: "Payment received", title: "Your radar is now watching your beers", aTitle: "Price drop!", aEx: "Example", aBeer: "Damm Lemon · 25 cl bottle · glass", aStore: "At your supermarket", aGoal: "We tell you when it reaches your <b>target price</b>.", c1: "🔔 Price drop alerts", c2: "🎯 Target price", c3: "⭐ What matters, on top", c4: "0.0 alcohol-free included", payTitle: "Premium pays for itself", estTag: "Estimate", costLbl: "Premium per month", gainLbl: "saved per month", howSum: "How do we calculate it?", estHow: "If you buy about 12 bottles a week and alerts get you to buy when they drop about €0.15 each. Premium costs €1.99 a month. This is an estimate: your real saving depends on what you buy.", status: "<b>Turning on your Premium:</b> it usually takes less than 3 hours. You can already create your alerts; they start notifying you as soon as it is on.", open: "Create my first alert", hint: "In the app, tap 🔔 Alerts at the top or your beer's price.", table: "Go to the price table", fine: "You can cancel any time from Paddle's e-mail.", exDate: "Real example from {d}" },
+    pt: { langLabel: "Idioma", paid: "Pagamento recebido", title: "Seu radar já vigia suas cervejas", aTitle: "Baixou!", aEx: "Exemplo", aBeer: "Damm Lemon · long neck 25 cl · vidro", aStore: "No seu supermercado", aGoal: "Avisamos quando chegar ao seu <b>preço-alvo</b>.", c1: "🔔 Alertas de queda", c2: "🎯 Preço-alvo", c3: "⭐ O importante, no topo", c4: "0,0 sem álcool incluídas", payTitle: "O Premium se paga sozinho", estTag: "Estimativa", costLbl: "Premium por mês", gainLbl: "de economia por mês", howSum: "Como calculamos?", estHow: "Se você compra uns 12 long necks por semana e os alertas fazem você comprar quando baixam uns 0,15 € cada. O Premium custa 1,99 € por mês. É uma estimativa: sua economia real depende do que você compra.", status: "<b>Ativando seu Premium:</b> costuma levar menos de 3 horas. Você já pode criar seus alertas; eles começam a avisar assim que ativar.", open: "Criar meu primeiro alerta", hint: "No app, toque em 🔔 Alertas no topo ou no preço da sua cerveja.", table: "Ir para a tabela de preços", fine: "Você pode cancelar quando quiser pelo e-mail da Paddle.", exDate: "Exemplo real de {d}" }
   };
-  var lang = new URLSearchParams(location.search).get("lang") || "";
-  var d = T[lang] || T[lang.split("-")[0]];
-  if (!d) return;
-  document.documentElement.lang = lang.split("-")[0];
-  document.querySelectorAll("[data-t]").forEach(function (n) { if (d[n.dataset.t]) n.textContent = d[n.dataset.t]; });
+  function eur(n, lang) { return (lang === "en" ? "€" : "") + n.toFixed(2).replace(".", lang === "en" ? "." : ",") + (lang === "en" ? "" : " €"); }
+  var sel = document.getElementById("lang");
+  function apply(lang) {
+    var d = T[lang] || T.es; lang = T[lang] ? lang : "es";
+    document.documentElement.lang = lang; sel.value = lang;
+    document.querySelectorAll("[data-t]").forEach(function (n) { if (d[n.dataset.t]) n.textContent = d[n.dataset.t]; });
+    document.querySelectorAll("[data-t-html]").forEach(function (n) { if (d[n.dataset.tHtml]) n.innerHTML = d[n.dataset.tHtml]; });
+    var prices = document.getElementById("aPrices"), drop = document.getElementById("aDrop");
+    if (EXAMPLE && EXAMPLE.old > EXAMPLE.now) {
+      // old price struck through, right next to the new one
+      prices.innerHTML = "<s>" + eur(EXAMPLE.old, lang) + "</s> <span class=\"new\">" + eur(EXAMPLE.now, lang) + "</span>";
+      drop.textContent = "−" + eur(EXAMPLE.old - EXAMPLE.now, lang);
+      document.getElementById("aStore").textContent = EXAMPLE.store;
+      document.querySelector(".alert .ex").textContent = d.exDate.replace("{d}", EXAMPLE.date);
+    } else {
+      prices.textContent = ""; drop.textContent = "−" + eur(0.15, lang);
+    }
+  }
+  var q = new URLSearchParams(location.search).get("lang") || "";
+  apply(T[q] ? q : q.split("-")[0]);
+  sel.addEventListener("change", function () {
+    apply(sel.value);
+    try { var u = new URL(location.href); u.searchParams.set("lang", sel.value); history.replaceState(null, "", u); } catch (e) {}
+  });
+  // the language menu must not fire a confetti burst
+  sel.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
 })();
 </script>
 <script>
