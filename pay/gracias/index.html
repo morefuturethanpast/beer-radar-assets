@@ -16,9 +16,24 @@ li span{font-size:22px;line-height:1}li b{display:block;color:var(--ink)}li smal
 .note{font-size:14px;margin:4px 0 18px}
 a.btn{display:block;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:12px}
 a.btn:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
+
+/* delight: radar rings, badge pop, staggered benefits, confetti (all off with reduced motion) */
+.hero{position:relative;width:72px;height:72px;margin:0 auto}
+.hero .logo{position:relative;z-index:1;animation:pop .7s cubic-bezier(.2,1.6,.4,1) both}
+.ring{position:absolute;inset:0;border:2px solid var(--accent);border-radius:50%;opacity:0;animation:ping 2.4s ease-out .5s infinite}
+.ring.r2{animation-delay:1.3s}
+.pro{animation:pop .6s cubic-bezier(.2,1.6,.4,1) .35s both}
+h1{animation:rise .5s ease-out .45s both}
+li{animation:rise .5s ease-out both}li:nth-child(1){animation-delay:.7s}li:nth-child(2){animation-delay:.85s}li:nth-child(3){animation-delay:1s}
+a.btn{animation:rise .5s ease-out 1.2s both;transition:transform .15s}a.btn:hover{transform:translateY(-2px)}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+@keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes rise{0%{transform:translateY(14px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#fx{display:none}}
 </style></head>
-<body><main>
-<img class="logo" src="../../icon/beer-radar-icon-512.png" alt="Beer Radar">
+<body><canvas id="fx" aria-hidden="true"></canvas><main>
+<div class="hero"><span class="ring"></span><span class="ring r2"></span><img class="logo" src="../../icon/beer-radar-icon-512.png" alt="Beer Radar"></div>
 <div class="pro">PREMIUM</div>
 <h1 data-t="title">¡Bienvenido a Premium!</h1>
 <p data-t="thanks">Gracias por apoyar Beer Radar. Esto es lo que tienes ahora:</p>
@@ -42,6 +57,36 @@ a.btn:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
   if (!d) return;
   document.documentElement.lang = lang.split("-")[0];
   document.querySelectorAll("[data-t]").forEach(function (n) { if (d[n.dataset.t]) n.textContent = d[n.dataset.t]; });
+})();
+</script>
+<script>
+// Confetti in the brand colours plus a few rising beer bubbles; ~3 s, then stops. Skipped with reduced motion.
+(function () {
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var c = document.getElementById("fx"), x = c.getContext("2d"), dpr = window.devicePixelRatio || 1, W, H, parts = [], t0 = performance.now();
+  function size() { W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr; }
+  size(); addEventListener("resize", size);
+  var colors = ["#2445c4", "#ffd23f", "#e0b100", "#5b7cf0", "#ffffff"];
+  for (var i = 0; i < 140; i++) parts.push({ x: W / 2, y: H * 0.32, vx: (Math.random() - 0.5) * 16 * dpr, vy: (-Math.random() * 14 - 4) * dpr,
+    w: (6 + Math.random() * 6) * dpr, h: (8 + Math.random() * 8) * dpr, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3, col: colors[i % colors.length], kind: "c" });
+  for (var j = 0; j < 26; j++) parts.push({ x: Math.random() * W, y: H + Math.random() * H * 0.4, vx: 0, vy: -(1.5 + Math.random() * 2.5) * dpr,
+    rad: (3 + Math.random() * 7) * dpr, wob: Math.random() * 6, kind: "b" });
+  (function frame(now) {
+    var t = (now - t0) / 1000;
+    x.clearRect(0, 0, W, H);
+    x.globalAlpha = t > 2.4 ? Math.max(0, 1 - (t - 2.4) / 0.8) : 1;
+    parts.forEach(function (p) {
+      if (p.kind === "c") {
+        p.vy += 0.35 * dpr; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+        x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.col; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); x.restore();
+      } else {
+        p.y += p.vy; p.wob += 0.08;
+        x.beginPath(); x.arc(p.x + Math.sin(p.wob) * 4 * dpr, p.y, p.rad, 0, 7);
+        x.strokeStyle = "rgba(224,177,0,.75)"; x.lineWidth = 1.5 * dpr; x.stroke(); x.fillStyle = "rgba(255,210,63,.25)"; x.fill();
+      }
+    });
+    if (t < 3.2) requestAnimationFrame(frame); else c.remove();
+  })(t0);
 })();
 </script>
 </body></html>
