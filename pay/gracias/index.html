@@ -18,9 +18,15 @@ a.btn{display:block;background:var(--accent);color:#fff;text-decoration:none;fon
 a.btn:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
 
 /* delight: radar rings, badge pop, staggered benefits, confetti (all off with reduced motion) */
-.hero{position:relative;width:72px;height:72px;margin:0 auto}
+.hero{position:relative;width:120px;height:120px;margin:0 auto;display:grid;place-items:center}
+.radar{position:absolute;inset:0;width:100%;height:100%;color:var(--accent)}
+.radar .sweep{transform-origin:14px 14px;animation:sweep 6s linear infinite}
+.save{background:var(--card);border:2px dashed var(--tag);border-radius:14px;padding:12px;margin:0 0 16px;text-align:left;animation:rise .5s ease-out 1.1s both}
+.save .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--tag);color:var(--tag-fg);border-radius:999px;padding:2px 8px}
+.save .big{display:block;font-size:22px;font-weight:800;color:var(--down);margin:6px 0 2px}
+.save small{color:var(--muted);font-size:13px}
 .hero .logo{position:relative;z-index:1;animation:pop .7s cubic-bezier(.2,1.6,.4,1) both}
-.ring{position:absolute;inset:0;border:2px solid var(--accent);border-radius:50%;opacity:0;animation:ping 2.4s ease-out .5s infinite}
+.ring{position:absolute;inset:24px;border:2px solid var(--accent);border-radius:50%;opacity:0;animation:ping 2.4s ease-out .5s infinite}
 .ring.r2{animation-delay:1.3s}
 .pro{animation:pop .6s cubic-bezier(.2,1.6,.4,1) .35s both}
 h1{animation:rise .5s ease-out .45s both}
@@ -29,11 +35,12 @@ a.btn{animation:rise .5s ease-out 1.2s both;transition:transform .15s}a.btn:hove
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
 @keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
 @keyframes rise{0%{transform:translateY(14px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes sweep{to{transform:rotate(360deg)}}
 @keyframes ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(2.6);opacity:0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#fx{display:none}}
 </style></head>
 <body><canvas id="fx" aria-hidden="true"></canvas><main>
-<div class="hero"><span class="ring"></span><span class="ring r2"></span><img class="logo" src="../../icon/beer-radar-icon-512.png" alt="Beer Radar"></div>
+<div class="hero"><svg class="radar" viewBox="0 0 28 28" aria-hidden="true" fill="none" stroke="currentColor" stroke-width=".8"><circle cx="14" cy="14" r="13" opacity=".3"/><circle cx="14" cy="14" r="9.5" opacity=".45"/><g class="sweep"><path d="M14 14 L14 1" stroke-width="1.2" stroke-linecap="round"/><path d="M14 14 L14 1 A13 13 0 0 1 25.3 7.5 Z" fill="currentColor" stroke="none" opacity=".22"/></g><circle cx="21" cy="7.6" r="1.2" fill="#ffd23f" stroke="none"/></svg><span class="ring"></span><span class="ring r2"></span><img class="logo" src="../../icon/beer-radar-icon-512.png" alt="Beer Radar"></div>
 <div class="pro">PREMIUM</div>
 <h1 data-t="title">¡Bienvenido a Premium!</h1>
 <p data-t="thanks">Gracias por apoyar Beer Radar. Esto es lo que tienes ahora:</p>
@@ -42,15 +49,16 @@ a.btn{animation:rise .5s ease-out 1.2s both;transition:transform .15s}a.btn:hove
 <li><span>🎯</span><div><b data-t="b2">Tu precio objetivo</b><small data-t="b2s">Elige cuánto quieres pagar, en uno o en todos tus supermercados.</small></div></li>
 <li><span>⭐</span><div><b data-t="b3">Lo importante, arriba</b><small data-t="b3s">Las alertas cumplidas salen arriba del todo al abrir la app.</small></div></li>
 </ul>
+<div class="save" id="save"><span class="tag" data-t="estTag">Estimación</span><b class="big" data-t="estBig">≈ 7 € de ahorro al mes</b><small data-t="estHow">Si compras unos 12 botellines a la semana y las alertas te hacen comprar cuando bajan unos 0,15 € cada uno. Premium cuesta 1,99 € al mes. Es una estimación: tu ahorro real depende de lo que compres.</small></div>
 <p class="note" data-t="note">Tu Premium se activa en unas horas, cuando confirmamos el pago. Puedes cancelar cuando quieras desde el e-mail de Paddle.</p>
 <a class="btn" id="open" href="https://claude.ai/artifact/SDr6rYmGxJVRmnvZVfQ3Ge" data-t="open">Abrir Beer Radar</a>
 </main>
 <script>
 (function () {
   var T = {
-    en: { title: "Welcome to Premium!", thanks: "Thanks for supporting Beer Radar. Here is what you get now:", b1: "Price drop alerts", b1s: "We tell you when your beer gets cheaper at your supermarket, with the old price struck through.", b2: "Your target price", b2s: "Choose how much you want to pay, at one or all of your supermarkets.", b3: "What matters, on top", b3s: "Alerts that are met show at the very top when you open the app.", note: "Your Premium turns on within a few hours, once we confirm the payment. You can cancel any time from Paddle's e-mail.", open: "Open Beer Radar" },
-    pt: { title: "Bem-vindo ao Premium!", thanks: "Obrigado por apoiar o Beer Radar. Agora você tem:", b1: "Alertas de queda de preço", b1s: "Avisamos quando sua cerveja fica mais barata no seu supermercado, com o preço anterior riscado.", b2: "Seu preço-alvo", b2s: "Escolha quanto quer pagar, em um ou em todos os seus supermercados.", b3: "O importante, no topo", b3s: "Os alertas cumpridos aparecem no topo ao abrir o app.", note: "Seu Premium é ativado em algumas horas, quando confirmamos o pagamento. Você pode cancelar quando quiser pelo e-mail da Paddle.", open: "Abrir o Beer Radar" },
-    ca: { title: "Benvingut a Premium!", thanks: "Gràcies per donar suport a Beer Radar. Això és el que tens ara:", b1: "Alertes de baixada de preu", b1s: "T'avisem quan la teva cervesa baixa al teu súper, amb el preu anterior ratllat.", b2: "El teu preu objectiu", b2s: "Tria quant vols pagar, en un o en tots els teus supermercats.", b3: "El més important, a dalt", b3s: "Les alertes complertes surten a dalt de tot en obrir l'app.", note: "El teu Premium s'activa en unes hores, quan confirmem el pagament. Pots cancel·lar quan vulguis des del correu de Paddle.", open: "Obrir Beer Radar" }
+    en: { title: "Welcome to Premium!", thanks: "Thanks for supporting Beer Radar. Here is what you get now:", b1: "Price drop alerts", b1s: "We tell you when your beer gets cheaper at your supermarket, with the old price struck through.", b2: "Your target price", b2s: "Choose how much you want to pay, at one or all of your supermarkets.", b3: "What matters, on top", b3s: "Alerts that are met show at the very top when you open the app.", note: "Your Premium turns on within a few hours, once we confirm the payment. You can cancel any time from Paddle's e-mail.", open: "Open Beer Radar", estTag: "Estimate", estBig: "≈ €7 saved per month", estHow: "If you buy about 12 bottles a week and alerts get you to buy when they drop about €0.15 each. Premium costs €1.99 a month. This is an estimate: your real saving depends on what you buy." },
+    pt: { title: "Bem-vindo ao Premium!", thanks: "Obrigado por apoiar o Beer Radar. Agora você tem:", b1: "Alertas de queda de preço", b1s: "Avisamos quando sua cerveja fica mais barata no seu supermercado, com o preço anterior riscado.", b2: "Seu preço-alvo", b2s: "Escolha quanto quer pagar, em um ou em todos os seus supermercados.", b3: "O importante, no topo", b3s: "Os alertas cumpridos aparecem no topo ao abrir o app.", note: "Seu Premium é ativado em algumas horas, quando confirmamos o pagamento. Você pode cancelar quando quiser pelo e-mail da Paddle.", open: "Abrir o Beer Radar", estTag: "Estimativa", estBig: "≈ 7 € de economia por mês", estHow: "Se você compra uns 12 long necks por semana e os alertas fazem você comprar quando baixam uns 0,15 € cada. O Premium custa 1,99 € por mês. É uma estimativa: sua economia real depende do que você compra." },
+    ca: { title: "Benvingut a Premium!", thanks: "Gràcies per donar suport a Beer Radar. Això és el que tens ara:", b1: "Alertes de baixada de preu", b1s: "T'avisem quan la teva cervesa baixa al teu súper, amb el preu anterior ratllat.", b2: "El teu preu objectiu", b2s: "Tria quant vols pagar, en un o en tots els teus supermercats.", b3: "El més important, a dalt", b3s: "Les alertes complertes surten a dalt de tot en obrir l'app.", note: "El teu Premium s'activa en unes hores, quan confirmem el pagament. Pots cancel·lar quan vulguis des del correu de Paddle.", open: "Obrir Beer Radar", estTag: "Estimació", estBig: "≈ 7 € d'estalvi al mes", estHow: "Si compres uns 12 botellins a la setmana i les alertes et fan comprar quan baixen uns 0,15 € cadascun. Premium costa 1,99 € al mes. És una estimació: el teu estalvi real depèn del que compris." }
   };
   var lang = new URLSearchParams(location.search).get("lang") || "";
   var d = T[lang] || T[lang.split("-")[0]];
@@ -60,33 +68,61 @@ a.btn{animation:rise .5s ease-out 1.2s both;transition:transform .15s}a.btn:hove
 })();
 </script>
 <script>
-// Confetti in the brand colours plus a few rising beer bubbles; ~3 s, then stops. Skipped with reduced motion.
+// Confetti bursts when the page opens and again on every click or tap (each burst lasts about 6 s); beer bubbles
+// rise from the bottom and wherever the pointer moves or a finger touches the screen. Skipped with reduced motion.
 (function () {
   if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var c = document.getElementById("fx"), x = c.getContext("2d"), dpr = window.devicePixelRatio || 1, W, H, parts = [], t0 = performance.now();
+  var CONFETTI_S = 6, FADE_S = 1.5;
+  var c = document.getElementById("fx"), x = c.getContext("2d"), dpr = window.devicePixelRatio || 1, W, H, t0 = performance.now();
+  var confetti = [], bubbles = [], running = false, lastSpawn = 0;
   function size() { W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr; }
   size(); addEventListener("resize", size);
   var colors = ["#2445c4", "#ffd23f", "#e0b100", "#5b7cf0", "#ffffff"];
-  for (var i = 0; i < 140; i++) parts.push({ x: W / 2, y: H * 0.32, vx: (Math.random() - 0.5) * 16 * dpr, vy: (-Math.random() * 14 - 4) * dpr,
-    w: (6 + Math.random() * 6) * dpr, h: (8 + Math.random() * 8) * dpr, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3, col: colors[i % colors.length], kind: "c" });
-  for (var j = 0; j < 26; j++) parts.push({ x: Math.random() * W, y: H + Math.random() * H * 0.4, vx: 0, vy: -(1.5 + Math.random() * 2.5) * dpr,
-    rad: (3 + Math.random() * 7) * dpr, wob: Math.random() * 6, kind: "b" });
-  (function frame(now) {
+  function burst(px, py, n) {
+    var born = performance.now();
+    for (var i = 0; i < n; i++) confetti.push({ x: px, y: py, vx: (Math.random() - 0.5) * 18 * dpr, vy: (-Math.random() * 15 - 5) * dpr, born: born,
+      w: (6 + Math.random() * 6) * dpr, h: (8 + Math.random() * 8) * dpr, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3, col: colors[i % colors.length] });
+    if (confetti.length > 900) confetti.splice(0, confetti.length - 900);
+    start();
+  }
+  burst(W / 2, H * 0.3, 180);
+  function bubble(px, py, n) {
+    for (var k = 0; k < n && bubbles.length < 220; k++) bubbles.push({ x: px + (Math.random() - 0.5) * 24 * dpr, y: py, vy: -(1.2 + Math.random() * 2.2) * dpr,
+      rad: (3 + Math.random() * 7) * dpr, wob: Math.random() * 6, life: 0 });
+    start();
+  }
+  for (var j = 0; j < 30; j++) bubble(Math.random() * W, H + Math.random() * H * 0.3, 1);
+  function onMove(e) {
+    var now = performance.now(); if (now - lastSpawn < 40) return; lastSpawn = now;
+    var p = e.touches ? e.touches[0] : e; if (!p) return;
+    bubble(p.clientX * dpr, p.clientY * dpr, e.touches ? 3 : 2);
+  }
+  addEventListener("pointerdown", function (e) { burst(e.clientX * dpr, e.clientY * dpr, 90); }, { passive: true });
+  addEventListener("pointermove", onMove, { passive: true });
+  addEventListener("touchstart", onMove, { passive: true });
+  addEventListener("touchmove", onMove, { passive: true });
+  function start() { if (!running) { running = true; requestAnimationFrame(frame); } }
+  function frame(now) {
     var t = (now - t0) / 1000;
     x.clearRect(0, 0, W, H);
-    x.globalAlpha = t > 2.4 ? Math.max(0, 1 - (t - 2.4) / 0.8) : 1;
-    parts.forEach(function (p) {
-      if (p.kind === "c") {
-        p.vy += 0.35 * dpr; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+    confetti = confetti.filter(function (p) { return (now - p.born) / 1000 < CONFETTI_S; });
+    confetti.forEach(function (p) {
+        var age = (now - p.born) / 1000;
+        x.globalAlpha = age > CONFETTI_S - FADE_S ? Math.max(0, (CONFETTI_S - age) / FADE_S) : 1;
+        p.vy = Math.min(p.vy + 0.28 * dpr, 6 * dpr); p.vx *= 0.985; p.x += p.vx + Math.sin(t * 3 + p.r) * 0.6 * dpr; p.y += p.vy; p.r += p.vr;
         x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.col; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); x.restore();
-      } else {
-        p.y += p.vy; p.wob += 0.08;
-        x.beginPath(); x.arc(p.x + Math.sin(p.wob) * 4 * dpr, p.y, p.rad, 0, 7);
-        x.strokeStyle = "rgba(224,177,0,.75)"; x.lineWidth = 1.5 * dpr; x.stroke(); x.fillStyle = "rgba(255,210,63,.25)"; x.fill();
-      }
     });
-    if (t < 3.2) requestAnimationFrame(frame); else c.remove();
-  })(t0);
+    x.globalAlpha = 1;
+    bubbles = bubbles.filter(function (p) { return p.y + p.rad > -10 && p.life < 400; });
+    bubbles.forEach(function (p) {
+      p.y += p.vy; p.wob += 0.08; p.life++;
+      x.beginPath(); x.arc(p.x + Math.sin(p.wob) * 4 * dpr, p.y, p.rad, 0, 7);
+      x.strokeStyle = "rgba(224,177,0,.8)"; x.lineWidth = 1.5 * dpr; x.stroke(); x.fillStyle = "rgba(255,210,63,.28)"; x.fill();
+    });
+    window.__fx = { confetti: confetti.length, bubbles: bubbles.length };
+    if (confetti.length || bubbles.length) requestAnimationFrame(frame); else { running = false; window.__fx = { confetti: 0, bubbles: 0 }; }
+  }
+  start();
 })();
 </script>
 </body></html>
