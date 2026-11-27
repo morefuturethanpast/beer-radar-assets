@@ -49,7 +49,7 @@ a.btn:focus-visible,a.link:focus-visible{outline:3px solid var(--tag);outline-of
 a.link{display:inline-block;margin-top:10px;color:var(--accent);font-weight:600;text-decoration:none;min-height:24px}
 .fine{font-size:12px;margin-top:14px}
 
-/* delight: radar rings, badge pop, staggered blocks, confetti (all off with reduced motion) */
+/* delight: radar rings, badge pop, staggered blocks, beer bubbles (all off with reduced motion) */
 .hero{position:relative;width:120px;height:120px;margin:0 auto;display:grid;place-items:center}
 /* The sweep is an HTML disc turned around its own centre (an SVG <g> with a px transform-origin
    turned around the wrong point in some browsers and stuck out of the logo like a bent antenna). */
@@ -137,64 +137,56 @@ var EXAMPLE = null;
     apply(sel.value);
     try { var u = new URL(location.href); u.searchParams.set("lang", sel.value); history.replaceState(null, "", u); } catch (e) {}
   });
-  // the language menu must not fire a confetti burst
+  // the language menu does not send up bubbles
   sel.addEventListener("pointerdown", function (e) { e.stopPropagation(); });
 })();
 </script>
 <script>
-// Confetti bursts when the page opens and again on every click or tap (each burst lasts about 6 s); beer bubbles
-// rise from the bottom and wherever the pointer moves or a finger touches the screen. Skipped with reduced motion.
+// Owner feedback 2026-11-27: no confetti. Beer bubbles rise from the bottom when the page opens; moving the mouse,
+// touching or clicking anywhere sends up smaller bubbles from that point. Skipped with reduced motion.
 (function () {
   if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  var CONFETTI_S = 6, FADE_S = 1.5;
+  var INTRO_MS = 5000;
   var c = document.getElementById("fx"), x = c.getContext("2d"), dpr = window.devicePixelRatio || 1, W, H, t0 = performance.now();
-  var confetti = [], bubbles = [], running = false, lastSpawn = 0;
+  var bubbles = [], running = false, lastSpawn = 0, introLeft = true;
   function size() { W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr; }
   size(); addEventListener("resize", size);
-  var colors = ["#2445c4", "#ffd23f", "#e0b100", "#5b7cf0", "#ffffff"];
-  function burst(px, py, n) {
-    var born = performance.now();
-    for (var i = 0; i < n; i++) confetti.push({ x: px, y: py, vx: (Math.random() - 0.5) * 18 * dpr, vy: (-Math.random() * 15 - 5) * dpr, born: born,
-      w: (6 + Math.random() * 6) * dpr, h: (8 + Math.random() * 8) * dpr, r: Math.random() * 6, vr: (Math.random() - 0.5) * 0.3, col: colors[i % colors.length] });
-    if (confetti.length > 900) confetti.splice(0, confetti.length - 900);
+  // big = the opening stream; small = the ones the user makes
+  function bubble(px, py, small) {
+    if (bubbles.length >= 260) return;
+    bubbles.push({ x: px, y: py, small: small, wob: Math.random() * 6,
+      vy: -(small ? 1.4 + Math.random() * 1.6 : 1.1 + Math.random() * 2.2) * dpr,
+      rad: (small ? 1.5 + Math.random() * 2.5 : 4 + Math.random() * 9) * dpr });
     start();
   }
-  burst(W / 2, H * 0.3, 180);
-  function bubble(px, py, n) {
-    for (var k = 0; k < n && bubbles.length < 220; k++) bubbles.push({ x: px + (Math.random() - 0.5) * 24 * dpr, y: py, vy: -(1.2 + Math.random() * 2.2) * dpr,
-      rad: (3 + Math.random() * 7) * dpr, wob: Math.random() * 6, life: 0 });
-    start();
-  }
-  for (var j = 0; j < 30; j++) bubble(Math.random() * W, H + Math.random() * H * 0.3, 1);
-  function onMove(e) {
-    var now = performance.now(); if (now - lastSpawn < 40) return; lastSpawn = now;
+  window.__fx = { confetti: 0, big: 0, small: 0, bubbles: 0 };
+  window.__fxSizes = function () { var b = bubbles.filter(function (p) { return !p.small; }).map(function (p) { return p.rad; }), s = bubbles.filter(function (p) { return p.small; }).map(function (p) { return p.rad; }); return b.length && s.length ? { bigMin: Math.min.apply(0, b), smallMax: Math.max.apply(0, s) } : null; };
+  function onUser(e) {
     var p = e.touches ? e.touches[0] : e; if (!p) return;
-    bubble(p.clientX * dpr, p.clientY * dpr, e.touches ? 3 : 2);
+    var now = performance.now(); if (e.type === "pointermove" && now - lastSpawn < 40) return; lastSpawn = now;
+    var n = e.type === "pointerdown" ? 6 : e.touches ? 3 : 2;
+    for (var k = 0; k < n; k++) bubble(p.clientX * dpr + (Math.random() - 0.5) * 16 * dpr, p.clientY * dpr, true);
   }
-  addEventListener("pointerdown", function (e) { burst(e.clientX * dpr, e.clientY * dpr, 90); }, { passive: true });
-  addEventListener("pointermove", onMove, { passive: true });
-  addEventListener("touchstart", onMove, { passive: true });
-  addEventListener("touchmove", onMove, { passive: true });
+  addEventListener("pointerdown", onUser, { passive: true });
+  addEventListener("pointermove", onUser, { passive: true });
+  addEventListener("touchstart", onUser, { passive: true });
+  addEventListener("touchmove", onUser, { passive: true });
   function start() { if (!running) { running = true; requestAnimationFrame(frame); } }
   function frame(now) {
-    var t = (now - t0) / 1000;
+    if (introLeft) {
+      if (now - t0 < INTRO_MS) { if (Math.random() < 0.25) bubble(Math.random() * W, H + 12 * dpr, false); }
+      else introLeft = false;
+    }
     x.clearRect(0, 0, W, H);
-    confetti = confetti.filter(function (p) { return (now - p.born) / 1000 < CONFETTI_S; });
-    confetti.forEach(function (p) {
-        var age = (now - p.born) / 1000;
-        x.globalAlpha = age > CONFETTI_S - FADE_S ? Math.max(0, (CONFETTI_S - age) / FADE_S) : 1;
-        p.vy = Math.min(p.vy + 0.28 * dpr, 6 * dpr); p.vx *= 0.985; p.x += p.vx + Math.sin(t * 3 + p.r) * 0.6 * dpr; p.y += p.vy; p.r += p.vr;
-        x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.col; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2))); x.restore();
-    });
-    x.globalAlpha = 1;
-    bubbles = bubbles.filter(function (p) { return p.y + p.rad > -10 && p.life < 400; });
+    bubbles = bubbles.filter(function (p) { return p.y + p.rad > -10; });
+    var big = 0, small = 0;
     bubbles.forEach(function (p) {
-      p.y += p.vy; p.wob += 0.08; p.life++;
-      x.beginPath(); x.arc(p.x + Math.sin(p.wob) * 4 * dpr, p.y, p.rad, 0, 7);
-      x.strokeStyle = "rgba(224,177,0,.8)"; x.lineWidth = 1.5 * dpr; x.stroke(); x.fillStyle = "rgba(255,210,63,.28)"; x.fill();
+      p.y += p.vy; p.vy *= 1.004; p.wob += 0.08; p.small ? small++ : big++;
+      x.beginPath(); x.arc(p.x + Math.sin(p.wob) * (p.small ? 2 : 4) * dpr, p.y, p.rad, 0, 7);
+      x.strokeStyle = "rgba(224,177,0,.8)"; x.lineWidth = (p.small ? 1 : 1.5) * dpr; x.stroke(); x.fillStyle = "rgba(255,210,63,.28)"; x.fill();
     });
-    window.__fx = { confetti: confetti.length, bubbles: bubbles.length };
-    if (confetti.length || bubbles.length) requestAnimationFrame(frame); else { running = false; window.__fx = { confetti: 0, bubbles: 0 }; }
+    window.__fx = { confetti: 0, big: big, small: small, bubbles: big + small };
+    if (bubbles.length || introLeft) requestAnimationFrame(frame); else running = false;
   }
   start();
 })();
