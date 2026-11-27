@@ -1,0 +1,47 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Beer Radar Premium</title><meta name="robots" content="noindex"><meta name="referrer" content="no-referrer">
+<!-- Shown by Paddle after a successful Premium payment (successUrl). Public page, no personal data.
+     Source: beer-radar/worker/static-pay/gracias/index.html -->
+<style>
+:root{--accent:#2445c4;--accent-soft:#e3e9fb;--tag:#ffd23f;--tag-fg:#1b1600;--ink:#1d2433;--muted:#5b6475;--bg:#f4f6fb;--card:#fff;--down:#0b7a3e}
+@media (prefers-color-scheme:dark){:root{--ink:#e8ecf6;--muted:#a3abbd;--bg:#0f1420;--card:#182033;--accent-soft:#22305a}}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
+main{width:100%;max-width:440px;background:var(--card);border-radius:20px;padding:28px 24px;box-shadow:0 10px 30px rgba(20,30,60,.12);text-align:center}
+.logo{width:72px;height:72px;border-radius:18px}
+.pro{display:inline-block;background:var(--tag);color:var(--tag-fg);font-weight:700;font-size:12px;letter-spacing:.06em;padding:3px 10px;border-radius:999px;margin-top:12px}
+h1{font-size:24px;margin:10px 0 4px}p{margin:0 0 6px;color:var(--muted)}
+ul{list-style:none;padding:0;margin:20px 0;text-align:left;display:grid;gap:12px}
+li{display:flex;gap:12px;align-items:flex-start;background:var(--accent-soft);border-radius:12px;padding:12px}
+li span{font-size:22px;line-height:1}li b{display:block;color:var(--ink)}li small{color:var(--muted)}
+.note{font-size:14px;margin:4px 0 18px}
+a.btn{display:block;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;padding:14px;border-radius:12px}
+a.btn:focus-visible{outline:3px solid var(--tag);outline-offset:2px}
+</style></head>
+<body><main>
+<img class="logo" src="../../icon/beer-radar-icon-512.png" alt="Beer Radar">
+<div class="pro">PREMIUM</div>
+<h1 data-t="title">¡Bienvenido a Premium!</h1>
+<p data-t="thanks">Gracias por apoyar Beer Radar. Esto es lo que tienes ahora:</p>
+<ul>
+<li><span>🔔</span><div><b data-t="b1">Alertas de bajada de precio</b><small data-t="b1s">Te avisamos cuando tu cerveza baja en tu súper, con el precio anterior tachado.</small></div></li>
+<li><span>🎯</span><div><b data-t="b2">Tu precio objetivo</b><small data-t="b2s">Elige cuánto quieres pagar, en uno o en todos tus supermercados.</small></div></li>
+<li><span>⭐</span><div><b data-t="b3">Lo importante, arriba</b><small data-t="b3s">Las alertas cumplidas salen arriba del todo al abrir la app.</small></div></li>
+</ul>
+<p class="note" data-t="note">Tu Premium se activa en unas horas, cuando confirmamos el pago. Puedes cancelar cuando quieras desde el e-mail de Paddle.</p>
+<a class="btn" id="open" href="https://claude.ai/artifact/SDr6rYmGxJVRmnvZVfQ3Ge" data-t="open">Abrir Beer Radar</a>
+</main>
+<script>
+(function () {
+  var T = {
+    en: { title: "Welcome to Premium!", thanks: "Thanks for supporting Beer Radar. Here is what you get now:", b1: "Price drop alerts", b1s: "We tell you when your beer gets cheaper at your supermarket, with the old price struck through.", b2: "Your target price", b2s: "Choose how much you want to pay, at one or all of your supermarkets.", b3: "What matters, on top", b3s: "Alerts that are met show at the very top when you open the app.", note: "Your Premium turns on within a few hours, once we confirm the payment. You can cancel any time from Paddle's e-mail.", open: "Open Beer Radar" },
+    pt: { title: "Bem-vindo ao Premium!", thanks: "Obrigado por apoiar o Beer Radar. Agora você tem:", b1: "Alertas de queda de preço", b1s: "Avisamos quando sua cerveja fica mais barata no seu supermercado, com o preço anterior riscado.", b2: "Seu preço-alvo", b2s: "Escolha quanto quer pagar, em um ou em todos os seus supermercados.", b3: "O importante, no topo", b3s: "Os alertas cumpridos aparecem no topo ao abrir o app.", note: "Seu Premium é ativado em algumas horas, quando confirmamos o pagamento. Você pode cancelar quando quiser pelo e-mail da Paddle.", open: "Abrir o Beer Radar" },
+    ca: { title: "Benvingut a Premium!", thanks: "Gràcies per donar suport a Beer Radar. Això és el que tens ara:", b1: "Alertes de baixada de preu", b1s: "T'avisem quan la teva cervesa baixa al teu súper, amb el preu anterior ratllat.", b2: "El teu preu objectiu", b2s: "Tria quant vols pagar, en un o en tots els teus supermercats.", b3: "El més important, a dalt", b3s: "Les alertes complertes surten a dalt de tot en obrir l'app.", note: "El teu Premium s'activa en unes hores, quan confirmem el pagament. Pots cancel·lar quan vulguis des del correu de Paddle.", open: "Obrir Beer Radar" }
+  };
+  var lang = new URLSearchParams(location.search).get("lang") || "";
+  var d = T[lang] || T[lang.split("-")[0]];
+  if (!d) return;
+  document.documentElement.lang = lang.split("-")[0];
+  document.querySelectorAll("[data-t]").forEach(function (n) { if (d[n.dataset.t]) n.textContent = d[n.dataset.t]; });
+})();
+</script>
+</body></html>

@@ -2,20 +2,20 @@
 <title>Beer Radar Premium</title><meta name="robots" content="noindex"><meta name="referrer" content="no-referrer">
 <!-- Static copy of the worker's /pay page, published at the Paddle "Default payment link"
      (https://morefuturethanpast.github.io/beer-radar-assets/pay/). Source: beer-radar/worker/static-pay/index.html.
-     Only public values here: Paddle client-side token (public by design) and the app link. -->
+     Only public values here: Paddle client-side token (public by design) and the thank-you page link. -->
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;font:16px system-ui,sans-serif;color:#1d2433;background:#f4f6fb}main{text-align:center;padding:24px}</style></head>
 <body><main><h1 style="font-size:20px">Beer Radar Premium</h1><p id="msg">Abriendo el pago seguro de Paddle…</p></main>
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 <script>
 (function () {
-  var CONFIG = { env: "sandbox", token: "test_90d2ef91dcdf8352c2f08446c47", appUrl: "https://claude.ai/artifact/SDr6rYmGxJVRmnvZVfQ3Ge" };
+  var CONFIG = { env: "sandbox", token: "test_90d2ef91dcdf8352c2f08446c47", thanksUrl: "https://morefuturethanpast.github.io/beer-radar-assets/pay/gracias/" };
   var LOCALES = ["ar", "zh-Hans", "zh-TW", "da", "nl", "en", "fr", "de", "it", "ja", "ko", "no", "pl", "pt", "pt-BR", "tr", "ru", "es", "sv"];
   var q = new URLSearchParams(location.search);
   var lang = q.get("lang"), locale = LOCALES.indexOf(lang) >= 0 ? lang : "es";
   if (!q.get("_ptxn")) { document.getElementById("msg").textContent = "Abre el pago desde Beer Radar (botón «Quiero Premium»)."; return; }
   if (CONFIG.env === "sandbox") Paddle.Environment.set("sandbox");
   // Paddle.js reads _ptxn from the URL and opens the checkout for that transaction.
-  Paddle.Initialize({ token: CONFIG.token, checkout: { settings: { locale: locale, displayMode: "overlay", theme: "light", successUrl: CONFIG.appUrl } } });
+  Paddle.Initialize({ token: CONFIG.token, checkout: { settings: { locale: locale, displayMode: "overlay", theme: "light", successUrl: CONFIG.thanksUrl + "?lang=" + encodeURIComponent(locale) } } });
 })();
 </script>
 </body></html>
